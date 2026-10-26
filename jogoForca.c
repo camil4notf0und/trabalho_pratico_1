@@ -1,4 +1,4 @@
-/*Camila Cardoso dos Reis Silva GRR20263633 Felipe Klass GRR2026*/
+/*Camila Cardoso dos Reis Silva GRR20263633 Felipe Augusto Klass GRR20260844*/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -17,11 +17,13 @@ int maxErros = 6, totalVitorias, totalDerrotas;
 
 void limpaBuffer();
 char *lerString();
+char *lerPalavra();
 void *alocar(size_t size);
 void *alocarZerado(int qtd, size_t size);
 int sorteio(int max, char sorteadas[], int *qtdSorteadas);
 void iniciaJogo(char *palavra, char *dica);
 void paraMaiusculo(char *s);
+void limpaTela();
 
 
 void main() {
@@ -30,6 +32,7 @@ void main() {
     char **palavras, **dicas;
     char *sorteadas;
     
+    limpaTela();
     printf("------------------------------------------------\n");
     printf("\n Bem-vindo ao jogo da Forca!\n");
     printf("\n------------------------------------------------\n");
@@ -52,17 +55,16 @@ void main() {
     
     for (i = 0; i < qtdPalavras; i++) {
 
-        printf("\n Digite a palavra %d:", i + 1);
+        printf("\n Digite a palavra (sem acento) %d:", i + 1);
         printf("\n -> ");
-        palavras[i] = lerString();
-        paraMaiusculo(palavras[i]);
+        palavras[i] = lerPalavra();
 
         printf("\n Digite a dica %d:", i + 1);
         printf("\n -> ");
         dicas[i] = lerString();
-
     }
-    
+
+    limpaTela();
     printf("\n Agora vamos jogar!\n");
 
     srand(time(NULL)); /*Gerar números aleatórios baseado no tempo do sistema*/
@@ -76,10 +78,16 @@ void main() {
         iniciaJogo(palavras[indSorteado], dicas[indSorteado]);
     }
 
+    limpaTela();
+
     printf("\n------------------------------------------------\n");
     printf("\n Total de partidas jogadas: %d\n", qtdPalavras);
-    printf("\n Total de vitórias: %d\n", totalVitorias);
+    printf("\n Total de vitorias: %d\n", totalVitorias);
     printf("\n Total de derrotas: %d\n", totalDerrotas);
+    printf("\n------------------------------------------------\n");
+
+    printf("\nPressione Enter para encerrar...");
+    limpaBuffer();
 
     /*Libera a memória alocada para as palavras e dicas*/
     for (int i = 0; i < qtdPalavras; i++) {
@@ -104,7 +112,7 @@ void limpaBuffer() {
 void *alocar(size_t size) {
     void *ptr = malloc(size);
     if (ptr == NULL) {
-        fprintf(stderr, "Erro: Falha na alocação de memória.\n");
+        fprintf(stderr, "Erro: Falha na alocação de memoria.\n");
         exit(EXIT_FAILURE);
     }
     return ptr;
@@ -114,7 +122,7 @@ void *alocar(size_t size) {
 void *alocarZerado(int qtd, size_t size) {
     void *ptr = calloc(qtd, size);
     if (ptr == NULL) {
-        fprintf(stderr, "Erro: Falha na alocação de memória.\n");
+        fprintf(stderr, "Erro: Falha na alocação de memoria.\n");
         exit(EXIT_FAILURE);
     }
     return ptr;
@@ -145,6 +153,28 @@ char *lerString() {
     return s;
 }
 
+char *lerPalavra() {
+    char *p;
+    int i, valida = 1;
+
+    p = lerString();
+    paraMaiusculo(p);
+
+    for (i = 0 ; p[i] != '\0'; i++) {
+        if ((p[i] <'A' || p[i] > 'Z') && (p[i] != '-' && p[i] != ' ')) {
+            valida = 0;
+            break;
+        }
+    }
+    if (!valida) {
+        printf("\n !!! Palavra invalida! Digite uma palavra sem acento e com apenas letras de 'A' a 'Z', espaco ou '-' !!!\n");
+        printf("\n -> ");
+        free(p);
+        return lerPalavra();
+    }
+    return p;
+}
+
 int sorteio(int max, char sorteadas[], int *qtdSorteadas) {
     int i, indice;
 
@@ -166,7 +196,7 @@ int sorteio(int max, char sorteadas[], int *qtdSorteadas) {
 
 /*Partida*/
 void iniciaJogo(char *palavra, char *dica) {
-    int erros = 0, acertos = 0, i, carcEspecial = 0;
+    int erros = 0, acertos = 0, i, carcEspecial = 0, resultado = 0;
     int tamanhoPalavra = strlen(palavra);
     char *palavraOculta = alocar((tamanhoPalavra + 1) * sizeof(char));
     char chutes[26] = {0}; /*Array para armazenar as letras chutadas*/
@@ -188,6 +218,14 @@ void iniciaJogo(char *palavra, char *dica) {
     palavraOculta[tamanhoPalavra] = '\0';
 
     do{
+        limpaTela();
+
+        if (resultado == 1) {
+            printf("\nLetra correta! Erros: %d/%d\n", erros, maxErros);
+        } else if (resultado == 2) {
+            printf("\nLetra incorreta! Erros: %d/%d\n", erros, maxErros);
+        }
+
         printf("\nDica: %s\n", dica);
         printf("\nPalavra: %s\n", palavraOculta);
         printf("\nLetras chutadas: ");
@@ -198,7 +236,7 @@ void iniciaJogo(char *palavra, char *dica) {
         } /*Mostra as letras chutadas*/
     
         do {
-            printf("\nDigite uma letra: ");
+            printf("\n\nDigite uma letra: ");
             printf("\n-> ");
             scanf("%c", &letra);
             limpaBuffer();
@@ -226,21 +264,26 @@ void iniciaJogo(char *palavra, char *dica) {
 
         if (!letraEncontrada) {
             erros++;
-            printf("\nLetra incorreta! Erros: %d/%d\n", erros, maxErros);
+            resultado = 2;
         } else {
-            printf("\nLetra correta!\n");
+            resultado = 1;
         }
 
     } while (acertos < (tamanhoPalavra - carcEspecial) && erros < maxErros); /*Loop da partida, remove caracteres especiais da contagem de letras*/
 
     if (acertos == (tamanhoPalavra - carcEspecial)) {
-        printf("\nParabéns! Você acertou a palavra: %s\n", palavra);
+        limpaTela();
+        printf("\nParabens! Voce acertou a palavra: %s\n", palavra);
         totalVitorias++;
     }
     else {
-        printf("\nVocê perdeu! A palavra era: %s\n", palavra);
+        limpaTela();
+        printf("\nVoce perdeu! A palavra era: %s\n", palavra);
         totalDerrotas++;
     }
+
+    printf("\nPressione Enter para continuar...");
+    limpaBuffer();
 
     /*Libera a memória alocada para a palavra oculta*/
     free(palavraOculta);
@@ -251,4 +294,13 @@ void paraMaiusculo(char *s) {
     int i;
     for (i = 0; s[i] != '\0'; i++)
         s[i] = toupper(s[i]);
+}
+
+/*Limpa a tela*/
+void limpaTela() {
+    #ifdef _WIN32
+        system("cls");
+    #else
+        system("clear");
+    #endif
 }
