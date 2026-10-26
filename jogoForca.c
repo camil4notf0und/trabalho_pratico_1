@@ -19,7 +19,7 @@ void limpaBuffer();
 char *lerString();
 char *lerPalavra();
 void *alocar(size_t size);
-void *alocarZerado(int qtd, size_t size);
+void *alocarZerado(size_t qtd, size_t size);
 int sorteio(int max, char sorteadas[], int *qtdSorteadas);
 void iniciaJogo(char *palavra, char *dica);
 void paraMaiusculo(char *s);
@@ -32,6 +32,8 @@ void main() {
     char **palavras, **dicas;
     char *sorteadas;
     char resposta;
+    
+    srand(time(NULL)); /*Gerar números aleatórios baseado no tempo do sistema*/
     
     do {
 
@@ -46,7 +48,7 @@ void main() {
             printf("\n -> ");
 
             if (scanf("%d", &qtdPalavras) != 1) {
-                qtdPalavras = 0; // Define qtdPalavras como 0 para entrar no loop de validação
+                qtdPalavras = 0; /*Define qtdPalavras como 0 para entrar no loop de validação*/
             }
 
             limpaBuffer();
@@ -75,7 +77,6 @@ void main() {
         limpaTela();
         printf("\n Agora vamos jogar!\n");
     
-        srand(time(NULL)); /*Gerar números aleatórios baseado no tempo do sistema*/
         
         sorteadas = alocarZerado(qtdPalavras, sizeof(char));
         qtdSorteadas = 0;
@@ -131,7 +132,7 @@ void *alocar(size_t size) {
 }
 
 /*Validação de alocação de memória zerada*/
-void *alocarZerado(int qtd, size_t size) {
+void *alocarZerado(size_t qtd, size_t size) {
     void *ptr = calloc(qtd, size);
     if (ptr == NULL) {
         fprintf(stderr, "Erro: Falha na alocação de memoria.\n");
@@ -167,7 +168,7 @@ char *lerString() {
 
 char *lerPalavra() {
     char *p;
-    int i, valida = 1;
+    int i, valida = 1, letras = 0;
 
     p = lerString();
     paraMaiusculo(p);
@@ -177,8 +178,11 @@ char *lerPalavra() {
             valida = 0;
             break;
         }
+        if (p[i] >= 'A' && p[i] <= 'Z') {
+            letras++;
+        }
     }
-    if (!valida) {
+    if (!valida || letras == 0) {
         printf("\n !!! Palavra invalida! Digite uma palavra sem acento e com apenas letras de 'A' a 'Z', espaco ou '-' !!!\n");
         printf("\n -> ");
         free(p);
@@ -250,7 +254,7 @@ void iniciaJogo(char *palavra, char *dica) {
         do {
             printf("\n\nDigite uma letra: ");
             printf("\n-> ");
-            scanf("%c", &letra);
+            scanf(" %c", &letra);
             limpaBuffer();
             letra = toupper(letra);
             if (letra < 'A' || letra > 'Z') {
