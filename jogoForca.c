@@ -31,72 +31,84 @@ void main() {
     int qtdPalavras = 0, i, indSorteado = 0, qtdSorteadas = 0;
     char **palavras, **dicas;
     char *sorteadas;
+    char resposta;
     
-    limpaTela();
-    printf("------------------------------------------------\n");
-    printf("\n Bem-vindo ao jogo da Forca!\n");
-    printf("\n------------------------------------------------\n");
-    
-    do { 
-        printf("\n Escolha a quantidade de palavras que deseja inserir para jogar forca:");
-        printf("\n -> ");
-        scanf("%d", &qtdPalavras);
-        limpaBuffer();
+    do {
 
-        if (qtdPalavras <= 0) {
-            printf("\n !!! Quantidade de palavras invalida! Digite um valor maior que 0 !!!\n");
-        }
+        limpaTela();
 
-    } while (qtdPalavras <= 0); /*Validação*/
-    
-    /*Aloca memória necessaria para as palavras e dicas*/
-    palavras = alocar(qtdPalavras * sizeof(char*));
-    dicas = alocar(qtdPalavras * sizeof(char*));
-    
-    for (i = 0; i < qtdPalavras; i++) {
-
-        printf("\n Digite a palavra (sem acento) %d:", i + 1);
-        printf("\n -> ");
-        palavras[i] = lerPalavra();
-
-        printf("\n Digite a dica %d:", i + 1);
-        printf("\n -> ");
-        dicas[i] = lerString();
-    }
-
-    limpaTela();
-    printf("\n Agora vamos jogar!\n");
-
-    srand(time(NULL)); /*Gerar números aleatórios baseado no tempo do sistema*/
-    
-    sorteadas = alocarZerado(qtdPalavras, sizeof(char));
-
-    /*Loop Partidas*/
-    for (i = 0; i < qtdPalavras; i++) {
-        indSorteado = sorteio(qtdPalavras, sorteadas, &qtdSorteadas);
+        printf("------------------------------------------------\n");
+        printf("\n Bem-vindo ao jogo da Forca!\n");
+        printf("\n------------------------------------------------\n");
         
-        iniciaJogo(palavras[indSorteado], dicas[indSorteado]);
-    }
+        do { 
+            printf("\n Escolha a quantidade de palavras que deseja inserir para jogar forca:");
+            printf("\n -> ");
 
-    limpaTela();
+            if (scanf("%d", &qtdPalavras) != 1) {
+                qtdPalavras = 0; // Define qtdPalavras como 0 para entrar no loop de validação
+            }
 
-    printf("\n------------------------------------------------\n");
-    printf("\n Total de partidas jogadas: %d\n", qtdPalavras);
-    printf("\n Total de vitorias: %d\n", totalVitorias);
-    printf("\n Total de derrotas: %d\n", totalDerrotas);
-    printf("\n------------------------------------------------\n");
+            limpaBuffer();
+    
+            if (qtdPalavras <= 0) {
+                printf("\n !!! Quantidade de palavras invalida! Digite um valor maior que 0 !!!\n");
+            }
+    
+        } while (qtdPalavras <= 0); /*Validação*/
+        
+        /*Aloca memória necessaria para as palavras e dicas*/
+        palavras = alocar(qtdPalavras * sizeof(char*));
+        dicas = alocar(qtdPalavras * sizeof(char*));
+        
+        for (i = 0; i < qtdPalavras; i++) {
+    
+            printf("\n Digite a palavra (sem acento) %d:", i + 1);
+            printf("\n -> ");
+            palavras[i] = lerPalavra();
+    
+            printf("\n Digite a dica %d:", i + 1);
+            printf("\n -> ");
+            dicas[i] = lerString();
+        }
+    
+        limpaTela();
+        printf("\n Agora vamos jogar!\n");
+    
+        srand(time(NULL)); /*Gerar números aleatórios baseado no tempo do sistema*/
+        
+        sorteadas = alocarZerado(qtdPalavras, sizeof(char));
+        qtdSorteadas = 0;
+    
+        /*Loop Partidas*/
+        for (i = 0; i < qtdPalavras; i++) {
+            indSorteado = sorteio(qtdPalavras, sorteadas, &qtdSorteadas);
+            
+            iniciaJogo(palavras[indSorteado], dicas[indSorteado]);
+        }
+    
+        limpaTela();
+    
+        printf("\n------------------------------------------------\n");
+        printf("\n Total de partidas jogadas: %d\n", totalVitorias + totalDerrotas);
+        printf("\n Total de vitorias: %d\n", totalVitorias);
+        printf("\n Total de derrotas: %d\n", totalDerrotas);
+        printf("\n------------------------------------------------\n");
+        
+        /*Libera a memória alocada para as palavras e dicas*/
+        for (i = 0; i < qtdPalavras; i++) {
+            free(palavras[i]);
+            free(dicas[i]);
+        }
+        free(palavras);
+        free(dicas);
+        free(sorteadas);
 
-    printf("\nPressione Enter para encerrar...");
-    limpaBuffer();
-
-    /*Libera a memória alocada para as palavras e dicas*/
-    for (int i = 0; i < qtdPalavras; i++) {
-        free(palavras[i]);
-        free(dicas[i]);
-    }
-    free(palavras);
-    free(dicas);
-    free(sorteadas);
+        printf("\n Deseja jogar novamente? (S - Sim / Qualquer outro caractere - Nao): ");
+        printf("\n -> ");
+        scanf(" %c", &resposta);
+        limpaBuffer();
+    } while (resposta == 'S' || resposta == 's'); /*Loop do jogo*/
 }
 
 /*Implementação das funções*/
