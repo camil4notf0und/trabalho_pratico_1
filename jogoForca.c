@@ -1,5 +1,4 @@
-/*Camila Cardoso dos Reis Silva GRR20263633
-  Felipe Klass GRR2026*/
+/*Camila Cardoso dos Reis Silva GRR20263633 Felipe Klass GRR2026*/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -53,26 +52,14 @@ void main() {
     
     for (i = 0; i < qtdPalavras; i++) {
 
-        do {
-            printf("\n Digite a palavra %d:", i + 1);
-            printf("\n -> ");
-            palavras[i] = lerString();
-            paraMaiusculo(palavras[i]);
+        printf("\n Digite a palavra %d:", i + 1);
+        printf("\n -> ");
+        palavras[i] = lerString();
+        paraMaiusculo(palavras[i]);
 
-            if (strlen(palavras[i]) == 0) {
-                printf("\n !!! Palavra invalida! Digite uma palavra com pelo menos 1 caractere !!!\n");
-            }
-        } while (strlen(palavras[i]) == 0); /*Validação*/
-        
-        do {
-            printf("\n Digite a dica %d:", i + 1);
-            printf("\n -> ");
-            dicas[i] = lerString();
-
-            if (strlen(dicas[i]) == 0) {
-                printf("\n !!! Dica invalida! Digite uma dica com pelo menos 1 caractere !!!\n");
-            }
-        } while (strlen(dicas[i]) == 0); /*Validação*/
+        printf("\n Digite a dica %d:", i + 1);
+        printf("\n -> ");
+        dicas[i] = lerString();
 
     }
     
@@ -137,11 +124,20 @@ char *lerString() {
     char buffer[TAM_BUFFER];
     char *s;
 
-    fgets(buffer, TAM_BUFFER, stdin);
-    if (buffer[strlen(buffer) - 1] != '\n') {
-        limpaBuffer(); /*Limpa o buffer se a entrada for maior que TAM_BUFFER*/
-    }
-    buffer[strcspn(buffer, "\n")] = '\0'; /*Remove o caractere de nova linha*/
+    do {
+
+        fgets(buffer, TAM_BUFFER, stdin);
+        if (buffer[strlen(buffer) - 1] != '\n') {
+            limpaBuffer(); /*Limpa o buffer se a entrada for maior que TAM_BUFFER*/
+        }
+        buffer[strcspn(buffer, "\n")] = '\0'; /*Remove o caractere de nova linha*/
+
+        if (strlen(buffer) == 0) {
+            printf("\n !!! Entrada invalida! Digite uma string com pelo menos 1 caractere !!!\n");
+            printf("\n -> ");
+        }
+
+    } while (strlen(buffer) == 0); /*Validação*/
 
     s = alocar((strlen(buffer) + 1) * sizeof(char));
     strcpy(s, buffer);
