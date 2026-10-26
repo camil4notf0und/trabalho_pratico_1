@@ -510,10 +510,8 @@ int computador_medio(char jog){
     escolhe_modo = (rand() % 2) * 2;
 
     if (escolhe_modo == 0){
-        ESPERAR(3000);
         return resp = computador_facil(jog);
     } else {
-        ESPERAR(3000);
         return resp = computador_dificil(jog);
     }
 }
